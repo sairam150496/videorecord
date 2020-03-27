@@ -8,6 +8,7 @@ export default function Navigator(): JSX.Element{
     const [mediaRecorder, setMediaRecorder] = useState<any | null>(null)
     const [chunks, setChunks] = useState<Array<any>>([])
     const [err, setErr] = useState<string>('')
+    const [cap, setCaps] = useState<any>({})
     useEffect(()=>{
        try{
         if(!stream){
@@ -65,6 +66,8 @@ export default function Navigator(): JSX.Element{
             }
           }
         };
+
+
         const handleStop = ()=>{
             const video = document.querySelector("video")!;
             video.pause();
@@ -81,13 +84,16 @@ export default function Navigator(): JSX.Element{
 
         const handlezoom =()=>{
             if(stream){
-                const tracks = stream.getVideoTracks()[0]
-                const capabilities = tracks.getCapabilities()
+                const tracks = stream.getVideoTracks()[0];
+                const capabilities = tracks.getCapabilities();
+                
+                setCaps(capabilities)
                 if(!("zoom" in capabilities)){
                     alert("Zoom is not supported in this device")
                 }else{
                     // stream.applyConstraints({zoom: })
                 }
+                
             }
             
         }
@@ -119,6 +125,15 @@ export default function Navigator(): JSX.Element{
           >
             zoom
           </button>
+          {
+            cap?Object.keys(cap).map((k)=>{
+              return(
+                <p key = {k}>
+                  {k}
+                </p>
+              )
+            }):""
+          }
         </div>
         
       </main>
