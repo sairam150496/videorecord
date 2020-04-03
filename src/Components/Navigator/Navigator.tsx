@@ -7,6 +7,7 @@ export default function Navigator(): JSX.Element{
     const [stream, setStream] = useState<any|null>(null)
     const [mediaRecorder, setMediaRecorder] = useState<any | null>(null)
     const [chunks, setChunks] = useState<Array<any>>([])
+    const [blobMain, blobArr] = useState<Array<Blob>>([])
     const [err, setErr] = useState<string>('')
     const [cap, setCaps] = useState<any>({})
     useEffect(()=>{
@@ -28,7 +29,6 @@ export default function Navigator(): JSX.Element{
               
                 mediaRecorder.start()
                 mediaRecorder.ondataavailable = (e: any)=>{
-                  console.log('data', e.data)
                     setChunks((chunk:Array<any>)=>{
                         const arr: Array<any> = chunk?chunk:[]
                         arr.push(e.data?e.data:0)
@@ -71,12 +71,14 @@ export default function Navigator(): JSX.Element{
         const handleStop = ()=>{
             const video = document.querySelector("video")!;
             video.pause();
-            
             mediaRecorder.stop()
             mediaRecorder.onstop = ()=>{
-              console.log("On stop")
+              console.log("In Here")
                 const blob = new Blob(chunks);
-                console.log("stop", blob)
+                blobArr(blo=>{
+                  return blo?[...blo, blob]:[]
+                })
+                sessionStorage.setItem("data", blobMain.toString())
                 const player:any = document.querySelector("#player")!;
                 player.src = window.URL.createObjectURL(blob)
             }
@@ -86,7 +88,6 @@ export default function Navigator(): JSX.Element{
             if(stream){
                 const tracks = stream.getVideoTracks()[0];
                 const capabilities = tracks.getCapabilities();
-                
                 setCaps(capabilities)
                 if(!("zoom" in capabilities)){
                     alert("Zoom is not supported in this device")
